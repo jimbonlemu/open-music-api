@@ -114,7 +114,12 @@ class PlaylistService {
 
     async getPlaylists(owner) {
         const query = {
-            text: `SELECT id,name,owner FROM playlists WHERE owner = $1`,
+            text: `
+                SELECT p.id, p.name, u.username 
+                FROM playlists p
+                JOIN users u ON p.owner = u.id
+                WHERE p.owner = $1
+            `,
             values: [owner],
         };
         const result = await this._pool.query(query);
@@ -184,7 +189,7 @@ class PlaylistService {
         };
 
         const result = await this._pool.query(query);
-        
+
         if (!result.rows.length) {
             throw new NotFoundError('Aktivitas tidak ditemukan');
         }
@@ -194,7 +199,7 @@ class PlaylistService {
             activities: result.rows,
         };
     }
-    
+
 }
 
 module.exports = PlaylistService;

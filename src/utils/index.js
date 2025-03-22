@@ -11,9 +11,9 @@ const mapSongsResulToModel = ({
 });
 
 const mapPlaylistResultToModel = ({
-    id, name, owner, created_at, updated_at
+    id, name, username, created_at, updated_at
 }) => ({
-    id, name, owner, createdAt: created_at, updatedAt: updated_at,
+    id, name, username, createdAt: created_at, updatedAt: updated_at,
 });
 
 const mapPlaylistSongs = (rows) => {
