@@ -10,7 +10,7 @@ class AlbumsHandler extends BaseHandler {
     async postAlbum({ payload }, h) {
         this._validator.validateAlbumPayload(payload);
         const albumId = await this._service.addAlbum(payload);
-
+ 
         return h
             .response({
                 status: 'success',
