@@ -184,9 +184,7 @@ class PlaylistService {
         };
 
         const result = await this._pool.query(query);
-
-        console.log('Activities Result:', result.rows);
-
+        
         if (!result.rows.length) {
             throw new NotFoundError('Aktivitas tidak ditemukan');
         }
