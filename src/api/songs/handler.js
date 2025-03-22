@@ -32,7 +32,6 @@ class SongsHandler extends BaseHandler {
         };
     }
 
-
     async getSongById({ params }, h) {
         const { id } = params;
         const song = await this._service.getSongById(id);
