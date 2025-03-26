@@ -2,10 +2,12 @@ const autoBind = require("auto-bind");
 const BaseHandler = require("../bases/handler");
 
 class PlaylistsHandler extends BaseHandler {
-    constructor(service, songsService, validator, playlistSongValidator) {
+    constructor(service, songsService, producerService, validator, playlistSongValidator, exportValidator) {
         super(service, validator);
         this._playlistSongValidator = playlistSongValidator;
         this._songsService = songsService;
+        this._producerService = producerService;
+        this._exportValidator = exportValidator;
 
         autoBind(this);
     }
@@ -39,21 +41,21 @@ class PlaylistsHandler extends BaseHandler {
     }
 
     async postSongIntoPlaylist(request, h) {
-            this._playlistSongValidator.validatePlaylistSongPayload(request.payload);
-            const { id: playlistId } = request.params;
-            const { id: credentialId } = request.auth.credentials;
-            const { songId } = request.payload;
+        this._playlistSongValidator.validatePlaylistSongPayload(request.payload);
+        const { id: playlistId } = request.params;
+        const { id: credentialId } = request.auth.credentials;
+        const { songId } = request.payload;
 
-            await this._service.verifyPlaylistAccess(playlistId, credentialId);
-            await this._songsService.getSongById(songId);
+        await this._service.verifyPlaylistAccess(playlistId, credentialId);
+        await this._songsService.getSongById(songId);
 
-            const songInplaylists = await this._service.addSongIntoPlaylist({ playlistId, songId, userId: credentialId });
+        const songInplaylists = await this._service.addSongIntoPlaylist({ playlistId, songId, userId: credentialId });
 
-            return h.response({
-                status: 'success',
-                message: 'Berhasil menambahkan lagu ke dalam playlist',
-                data: { songInplaylists },
-            }).code(201);
+        return h.response({
+            status: 'success',
+            message: 'Berhasil menambahkan lagu ke dalam playlist',
+            data: { songInplaylists },
+        }).code(201);
     }
 
     async getPlaylistById(request, h) {
@@ -112,6 +114,28 @@ class PlaylistsHandler extends BaseHandler {
             status: 'success',
             data: activities,
         };
+    }
+
+    async postExportPlaylist(request, h) {
+        this._exportValidator.validateExportNotesPayload(request.payload);
+        const { id: playlistId } = request.params;
+        const { id: credentialId } = request.auth.credentials;
+        const { targetEmail } = request.payload;
+
+        await this._service.verifyPlaylistOwner(playlistId, credentialId);
+
+        const message = {
+            playlistId,
+            targetEmail,
+        };
+
+        await this._producerService.sendMessage('export:playlist', JSON.stringify(message));
+
+        return h.response({
+            status: 'success',
+            message: 'Permintaan Anda sedang kami proses',
+        }).code(201);
+
     }
 
 }
