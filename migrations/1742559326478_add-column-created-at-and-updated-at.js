@@ -1,8 +1,6 @@
 /**
  * @type {import('node-pg-migrate').ColumnDefinitions | undefined}
  */
-exports.shorthands = undefined;
-
 /**
  * @param pgm {import('node-pg-migrate').MigrationBuilder}
  * @param run {() => void | undefined}
@@ -60,7 +58,6 @@ exports.up = (pgm) => {
         },
     });
 
-    // Menghapus default setelah kolom berhasil ditambahkan
     pgm.alterColumn('users', 'created_at', { default: null });
     pgm.alterColumn('users', 'updated_at', { default: null });
     pgm.alterColumn('authentications', 'created_at', { default: null });
